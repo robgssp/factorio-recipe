@@ -1,3 +1,6 @@
+-- Modified from pfmoore's gist here:
+-- https://gist.github.com/pfmoore/aa101ee1daeebf202e87
+
 json = require "json"
 
 data = {}
