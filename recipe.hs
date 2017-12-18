@@ -1,3 +1,5 @@
+-- Factorio recipe utilities by Rob Glossop.
+
 import Data.Aeson
 import Data.Aeson.Types
 import Data.Ratio
@@ -143,4 +145,4 @@ main = do recipes <- dingus
 
 -- check base ingredients for ht, prod science
 -- prod sci: 10 brick, 10 iron, 25 copper, 10 steel, 10 plastic, 1 EEU
--- actual: 15 iron, 47.5 copper, 10 plastic, 3 processor, 1 battery
+-- ht sci: 15 iron, 47.5 copper, 10 plastic, 3 processor, 1 battery
