@@ -7,6 +7,7 @@ import Data.String
 import System.IO
 import System.IO.Unsafe
 import Data.Either
+import Control.Monad
 import qualified Data.ByteString.Lazy as B
 import qualified Data.Map as Map
 import qualified Data.Set as Set
@@ -124,7 +125,7 @@ fullAmounts item recipes = amounts' 1 item
             Nothing -> Map.singleton item count
 
 sciences :: [Item]
-sciences = ["science-pack-1", "science-pack-2", "science-pack-3", "production-science-pack","high-tech-science-pack"]
+sciences = ["science-pack-1", "science-pack-2", "science-pack-3", "military-science-pack", "production-science-pack","high-tech-science-pack"]
 
 amounts :: [Item] -> [Recipe] -> Map.Map Item Rational
 amounts items recipes = unionsAdd (map (flip fullAmounts recipes) items)
@@ -141,7 +142,10 @@ dingus = do Right recipes <- readJson
 recipes = unsafePerformIO dingus
 
 main = do recipes <- dingus          
-          print (fullAmounts "high-tech-science-pack" recipes)
+          prints (amounts sciences recipes)
+
+prints map = forM_ (Map.toList (readable map)) $ \(item, amount) -> do
+               putStrLn (itemName item ++ ": " ++ show amount)
 
 -- check base ingredients for ht, prod science
 -- prod sci: 10 brick, 10 iron, 25 copper, 10 steel, 10 plastic, 1 EEU
