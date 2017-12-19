@@ -125,24 +125,38 @@ fullAmounts item recipes = amounts' 1 item
             Nothing -> Map.singleton item count
 
 sciences :: [Item]
-sciences = ["science-pack-1", "science-pack-2", "science-pack-3", "military-science-pack", "production-science-pack","high-tech-science-pack"]
+sciences = ["science-pack-1", "science-pack-2", "science-pack-3"
+           ,"military-science-pack", "production-science-pack"
+           ,"high-tech-science-pack"]
 
 amounts :: [Item] -> [Recipe] -> Map.Map Item Rational
 amounts items recipes = unionsAdd (map (flip fullAmounts recipes) items)
 amounts' items recipes = unionsAdd (map (flip baseAmounts recipes) items)
 
+-- the number of factories required for each item. rate * crafting time / yield
+factoriesOf :: Map.Map Item Rational -> [Recipe] -> Map.Map Item Rational
+factoriesOf amounts recipes = Map.mapMaybeWithKey 
+  (\item amount -> 
+        (\recipe -> amount * 
+                    (approxRational (recTime recipe) 0.01) * 
+                    (1 % yield item recipe)) <$> 
+        (recipeOf item recipes)) 
+  amounts
+  
+factories items recipes = factoriesOf (amounts items recipes) recipes
+
 readable :: Map.Map Item Rational -> Map.Map Item Double
 readable = fmap fromRational
 
 dingus = do Right recipes <- readJson
-            return $ limits [ "iron-plate","copper-plate", "plastic-bar"
-                            , "petroleum-gas" 
-                            , "electric-engine-unit", "steel-plate"]
+            return $ limits [ "iron-plate", "copper-plate", "plastic-bar"
+                            , "petroleum-gas"
+                            , "electric-engine-unit"]
                             recipes
 recipes = unsafePerformIO dingus
 
-main = do recipes <- dingus          
-          prints (amounts sciences recipes)
+main = do recipes <- dingus
+          prints (factories sciences recipes)
 
 prints map = forM_ (Map.toList (readable map)) $ \(item, amount) -> do
                putStrLn (itemName item ++ ": " ++ show amount)
